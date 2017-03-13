@@ -1,0 +1,20 @@
+Problema 8:
+  8. Implemente um servidor de busca em repositórios que permita clientes 
+  armazenarem palavras em repositórios distribuídos (usar pelo menos 3 
+  repositórios) e também solicitarem ao servidor que consulte qual(is) 
+  repositório(s) contém uma determinada palavra. 
+  Atenção: os repositórios devem estar em máquinas distintas.
+
+Solução:
+  Repositório: Contém um dicionário de palavras (um map, por exemplo)
+               e funções que permitem adicionarPalavra(), removerPalavra()
+               e consultarPalavra().
+
+  Servidor de Busca: Contém uma lista dos repositórios ativos e uma
+                     função de busca() que busca por uma palavra em
+                     todos os repositórios conhecidos e uma função
+                     de registro() que registra uma palavra nos
+                     repositórios especificados.
+
+  Cliente: conhece o servidor de busca e pode buscar ou registrar
+           palavras. Também tem a interface direta com o usuário.
