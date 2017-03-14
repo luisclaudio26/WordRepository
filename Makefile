@@ -1,3 +1,11 @@
-all:
-	javac -cp . words/repo/*.java
-	javac -cp . words/search/*.java
+sourcefiles = $(shell find words -name '*.java')
+
+classfiles = $(sourcefiles:.java=.class)
+
+all: $(classfiles)
+
+%.class : %.java
+	javac -g $<
+
+clean: $(classfiles)
+	rm -rf $?
