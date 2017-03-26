@@ -18,16 +18,21 @@ public class Repository extends UnicastRemoteObject implements IRepository {
 	//------------------------------
 	@Override
 	public void pushWord(String w) {
+		System.out.print("Pushing word '" + w + "'...");
 		words.add(w);
+		System.out.print("done.\n");
 	}
 
 	@Override
 	public void removeWord(String w) {
+		System.out.print("Remove word '" + w + "'...");
 		words.remove(w);
+		System.out.print("done.\n");
 	}
 
 	@Override
 	public boolean hasWord(String w) {
+		System.out.println("Checking for word '" + w + "'...");
 		return words.contains(w);
 	}
 
@@ -40,11 +45,13 @@ public class Repository extends UnicastRemoteObject implements IRepository {
 			return;
 		}
 
-		try {
-			String serverName = args[0];
-			String serverAddress = args[1];
-			String gatewayAddress = args[2];
+		String serverName = args[0];
+		String serverAddress = args[1];
+		String gatewayAddress = args[2];
 
+	  	System.setProperty("java.rmi.server.hostname", serverAddress);
+
+		try {
 			//Register this repository in gateway server
 			System.out.print("Registering in gateway...");
 			ISearchGateway gateway = (ISearchGateway)Naming.lookup("//" + gatewayAddress + "/query");
