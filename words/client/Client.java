@@ -3,6 +3,7 @@ package words.client;
 import java.rmi.*;
 import java.util.*;
 import words.search.ISearchGateway;
+import java.rmi.registry.*;
 
 public class Client
 {
@@ -18,7 +19,8 @@ public class Client
 
 			String address = args[0];
 			Scanner in = new Scanner(System.in);
-			ISearchGateway gateway = (ISearchGateway)Naming.lookup("//" + address + "/query");
+			Registry reg = LocateRegistry.getRegistry(address);
+			ISearchGateway gateway = (ISearchGateway)reg.lookup("query");
 
 			while(true)
 			{

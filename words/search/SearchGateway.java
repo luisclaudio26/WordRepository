@@ -4,6 +4,7 @@ import words.repo.IRepository;
 import java.util.*;
 import java.rmi.*;
 import java.rmi.server.*;
+import java.rmi.registry.*;
 
 public class SearchGateway extends UnicastRemoteObject implements ISearchGateway {
 
@@ -35,6 +36,8 @@ public class SearchGateway extends UnicastRemoteObject implements ISearchGateway
 	@Override
 	public void register(String w) throws RemoteException
 	{
+		if(servers.isEmpty()) return;
+
 		try{
 			System.out.print("Registering word '" + w + "'...");
 			
@@ -54,6 +57,8 @@ public class SearchGateway extends UnicastRemoteObject implements ISearchGateway
 	public List<String> search(String w) throws RemoteException
 	{
 		List<String> out = new ArrayList<String>();
+
+		if(servers.isEmpty()) return out;
 
 		try {
 			System.out.print("Searching for '" + w + "'...");
@@ -90,9 +95,10 @@ public class SearchGateway extends UnicastRemoteObject implements ISearchGateway
 			System.out.println("Waking up query server...");
 
 			ISearchGateway rep = new SearchGateway();
-			Naming.rebind("//" + address + "/query", rep);
+			Registry reg = LocateRegistry.createRegistry(1099);
+			reg.rebind("query", rep);
 
-			System.out.print("Ok. I'm listening at //" + address + "/query.");
+			System.out.print("Ok. I'm listening at " + address + ":query.");
 		} catch(Exception e) {
 			System.err.println("REPOSITORY ERROR:\n" + e.getMessage());
 			e.printStackTrace();
