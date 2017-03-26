@@ -77,14 +77,22 @@ public class SearchGateway extends UnicastRemoteObject implements ISearchGateway
 	//------ search gateway thread -------
 	public static void main(String[] args) throws RemoteException {
 
+		if(args.length < 1)
+		{
+			System.err.println("Please, input server IP address as argument");
+			return;
+		}
+
+		String address = args[0];
+	  	System.setProperty("java.rmi.server.hostname", address);
+		
 		try {
 			System.out.println("Waking up query server...");
 
-			String host = "localhost";
 			ISearchGateway rep = new SearchGateway();
-			Naming.rebind("//" + host + "/query", rep);
+			Naming.rebind("//" + address + "/query", rep);
 
-			System.out.print("Ok. I'm listening at //" + host + "/query.");
+			System.out.print("Ok. I'm listening at //" + address + "/query.");
 		} catch(Exception e) {
 			System.err.println("REPOSITORY ERROR:\n" + e.getMessage());
 			e.printStackTrace();

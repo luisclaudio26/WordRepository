@@ -33,18 +33,29 @@ public class Repository extends UnicastRemoteObject implements IRepository {
 
 	//----- repository thread -----
 	public static void main(String[] args) {
-		try {
 
+		if(args.length < 3)
+		{
+			System.err.println("Provide server name, address and gateway address as argument.");
+			return;
+		}
+
+		try {
+			String serverName = args[0];
+			String serverAddress = args[1];
+			String gatewayAddress = args[2];
+
+			//Register this repository in gateway server
 			System.out.print("Registering in gateway...");
-			ISearchGateway gateway = (ISearchGateway)Naming.lookup("//localhost/query");
-			gateway.registerServer("WordRep");
+			ISearchGateway gateway = (ISearchGateway)Naming.lookup("//" + gatewayAddress + "/query");
+			gateway.registerServer(serverName);
 			System.out.print("done.\n");
 
+			//wake up this server
 			System.out.println("Waking up server...");
-			String host = "localhost";
 			IRepository rep = new Repository();
-			Naming.rebind("//" + host + "/WordRep", rep);
-			System.out.print("Ok. I'm listening at //" + host + "/WordRep.");
+			Naming.rebind("//" + serverAddress + "/" + serverName, rep);
+			System.out.print("Ok. I'm listening at //" + serverAddress + "/" + serverName);
 
 		} catch(Exception e) {
 			System.err.println("REPOSITORY ERROR:\n" + e.getMessage());

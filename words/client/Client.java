@@ -8,10 +8,17 @@ public class Client
 {
 	public static void main(String[] args)
 	{
+		if(args.length < 1)
+		{
+			System.err.println("Please input gateway address.");
+			return;
+		}
+
 		try {
 
+			String address = args[0];
 			Scanner in = new Scanner(System.in);
-			ISearchGateway gateway = (ISearchGateway)Naming.lookup("//localhost/query");
+			ISearchGateway gateway = (ISearchGateway)Naming.lookup("//" + address + "/query");
 
 			while(true)
 			{
