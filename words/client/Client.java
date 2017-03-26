@@ -4,6 +4,8 @@ import java.rmi.*;
 import java.util.*;
 import words.search.ISearchGateway;
 import java.rmi.registry.*;
+import java.rmi.server.*;
+import java.net.*;
 
 public class Client
 {
@@ -20,7 +22,24 @@ public class Client
 			String address = args[0];
 			int port = Integer.parseInt(args[1]);
 			Scanner in = new Scanner(System.in);
-			Registry reg = LocateRegistry.getRegistry(address, port);
+			
+			Registry reg = LocateRegistry.getRegistry(address, 1099,
+							new RMIClientSocketFactory() {
+								public Socket createSocket(String host, int port) {
+									Socket s = null;
+
+									try {
+										s = new Socket(host, port);
+									} catch(Exception e) {
+										System.err.println("ERROR WHILE OPENING CLIENT SOCKET:\n" + e.getMessage());
+										e.printStackTrace();
+									}
+
+									return s;
+								}
+							});
+
+
 			ISearchGateway gateway = (ISearchGateway)reg.lookup("query");
 
 			while(true)
