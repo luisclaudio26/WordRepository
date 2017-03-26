@@ -9,17 +9,18 @@ public class Client
 {
 	public static void main(String[] args)
 	{
-		if(args.length < 1)
+		if(args.length < 2)
 		{
-			System.err.println("Please input gateway address.");
+			System.err.println("Please input gateway address and client operating port.");
 			return;
 		}
 
 		try {
 
 			String address = args[0];
+			int port = Integer.parseInt(args[1]);
 			Scanner in = new Scanner(System.in);
-			Registry reg = LocateRegistry.getRegistry(address);
+			Registry reg = LocateRegistry.getRegistry(address, port);
 			ISearchGateway gateway = (ISearchGateway)reg.lookup("query");
 
 			while(true)
