@@ -5,6 +5,7 @@ import java.util.*;
 import java.rmi.*;
 import java.rmi.server.*;
 import java.rmi.registry.*;
+import java.net.*;
 
 public class SearchGateway extends UnicastRemoteObject implements ISearchGateway {
 
@@ -79,6 +80,42 @@ public class SearchGateway extends UnicastRemoteObject implements ISearchGateway
 		}
 	}
 
+	public static class ClientRMISocket implements RMIClientSocketFactory
+	{
+		@Override
+	 	public Socket createSocket(String host, int port)
+	 	{
+	 		Socket out = null;
+
+	 		try {
+	 			out = new Socket(host, 1100);
+	 		} catch(Exception e) {
+	 			System.err.println("Error while creating Client socket:\n" + e.getMessage());
+	 			e.printStackTrace();
+	 		}
+
+	 		return out;
+	 	}
+	}
+
+	public static class ServerRMISocket implements RMIServerSocketFactory
+	{
+		@Override
+		public ServerSocket createServerSocket(int port)
+		{
+	 		ServerSocket out = null;
+
+	 		try {
+	 			out = new ServerSocket(1099);
+	 		} catch(Exception e) {
+	 			System.err.println("Error while creating Server socket:\n" + e.getMessage());
+	 			e.printStackTrace();
+	 		}
+
+	 		return out;	
+		}
+	}
+
 	//------ search gateway thread -------
 	public static void main(String[] args) throws RemoteException {
 
@@ -94,8 +131,11 @@ public class SearchGateway extends UnicastRemoteObject implements ISearchGateway
 		try {
 			System.out.println("Waking up query server...");
 
+			SearchGateway.ServerRMISocket ssf = new SearchGateway.ServerRMISocket();
+			SearchGateway.ClientRMISocket csf = new SearchGateway.ClientRMISocket();
+
 			ISearchGateway rep = new SearchGateway();
-			Registry reg = LocateRegistry.createRegistry(1099);
+			Registry reg = LocateRegistry.createRegistry(1099, csf, ssf);
 			reg.rebind("query", rep);
 
 			System.out.print("Ok. I'm listening at " + address + ":query.");

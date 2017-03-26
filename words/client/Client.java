@@ -13,7 +13,7 @@ public class Client
 	{
 		if(args.length < 2)
 		{
-			System.err.println("Please input gateway address and client operating port.");
+			System.err.println("Please input gateway address and port.");
 			return;
 		}
 
@@ -23,23 +23,7 @@ public class Client
 			int port = Integer.parseInt(args[1]);
 			Scanner in = new Scanner(System.in);
 			
-			Registry reg = LocateRegistry.getRegistry(address, 1099,
-							new RMIClientSocketFactory() {
-								public Socket createSocket(String host, int port) {
-									Socket s = null;
-
-									try {
-										s = new Socket(host, port);
-									} catch(Exception e) {
-										System.err.println("ERROR WHILE OPENING CLIENT SOCKET:\n" + e.getMessage());
-										e.printStackTrace();
-									}
-
-									return s;
-								}
-							});
-
-
+			Registry reg = LocateRegistry.getRegistry(address);
 			ISearchGateway gateway = (ISearchGateway)reg.lookup("query");
 
 			while(true)
