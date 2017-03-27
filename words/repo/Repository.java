@@ -9,7 +9,7 @@ import words.search.*;
 import words.client.*;
 
 public class Repository extends UnicastRemoteObject implements IRepository {
-	public static final int PORT = 1100;
+	public static final int PORT = 1099;
 	private Set<String> words;
 
 	public Repository() throws RemoteException {
@@ -71,7 +71,7 @@ public class Repository extends UnicastRemoteObject implements IRepository {
 			Registry reg = LocateRegistry.createRegistry(Repository.PORT);
 			reg.rebind(serverName, rep);
 			
-			System.out.println("Ok. I'm listening at //" + serverAddress + "/" + serverName);
+			System.out.println("Ok. I'm listening at " + serverAddress + ":" + serverName);
 
 		} catch(Exception e) {
 			System.err.println("REPOSITORY ERROR:\n" + e.getMessage());
