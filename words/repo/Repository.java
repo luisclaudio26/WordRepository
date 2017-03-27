@@ -2,12 +2,15 @@ package words.repo;
 
 import java.rmi.*;
 import java.rmi.server.*;
+import java.rmi.registry.*;
 import java.util.Set;
 import java.util.TreeSet;
 import words.search.*;
+import words.client.*;
 
 public class Repository extends UnicastRemoteObject implements IRepository {
-	Set<String> words;
+	public static final int PORT = 1100;
+	private Set<String> words;
 
 	public Repository() throws RemoteException {
 		words = new TreeSet<String>();
@@ -54,15 +57,21 @@ public class Repository extends UnicastRemoteObject implements IRepository {
 		try {
 			//Register this repository in gateway server
 			System.out.print("Registering in gateway...");
-			ISearchGateway gateway = (ISearchGateway)Naming.lookup("//" + gatewayAddress + "/query");
-			gateway.registerServer(serverName);
+			
+			Registry gatewayReg = LocateRegistry.getRegistry(gatewayAddress, SearchGateway.PORT);
+			ISearchGateway gateway = (ISearchGateway)gatewayReg.lookup("query");
+			gateway.registerServer(serverName, serverAddress);
+			
 			System.out.print("done.\n");
 
 			//wake up this server
 			System.out.println("Waking up server...");
+			
 			IRepository rep = new Repository();
-			Naming.rebind("//" + serverAddress + "/" + serverName, rep);
-			System.out.print("Ok. I'm listening at //" + serverAddress + "/" + serverName);
+			Registry reg = LocateRegistry.createRegistry(Repository.PORT);
+			reg.rebind(serverName, rep);
+			
+			System.out.println("Ok. I'm listening at //" + serverAddress + "/" + serverName);
 
 		} catch(Exception e) {
 			System.err.println("REPOSITORY ERROR:\n" + e.getMessage());

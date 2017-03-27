@@ -1,29 +1,28 @@
 package words.client;
 
-import java.rmi.*;
 import java.util.*;
-import words.search.ISearchGateway;
+import java.rmi.*;
+import java.net.*;
 import java.rmi.registry.*;
 import java.rmi.server.*;
-import java.net.*;
+import words.search.*;
 
 public class Client
 {
 	public static void main(String[] args)
 	{
-		if(args.length < 2)
+		if(args.length < 1)
 		{
-			System.err.println("Please input gateway address and port.");
+			System.err.println("Please input gateway address.");
 			return;
 		}
 
 		try {
 
 			String address = args[0];
-			int port = Integer.parseInt(args[1]);
 			Scanner in = new Scanner(System.in);
 			
-			Registry reg = LocateRegistry.getRegistry(address);
+			Registry reg = LocateRegistry.getRegistry(address, SearchGateway.PORT);
 			ISearchGateway gateway = (ISearchGateway)reg.lookup("query");
 
 			while(true)

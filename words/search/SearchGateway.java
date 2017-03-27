@@ -1,6 +1,7 @@
 package words.search;
 
 import words.repo.IRepository;
+import words.repo.Repository;
 import java.util.*;
 import java.rmi.*;
 import java.rmi.server.*;
@@ -9,23 +10,24 @@ import java.net.*;
 
 public class SearchGateway extends UnicastRemoteObject implements ISearchGateway {
 
-	List<String> servers;
+	public static final int PORT = 1099;
+	private Map<String,String> servers;
 
 	public SearchGateway() throws RemoteException
 	{
-		servers = new ArrayList<String>();
+		servers = new HashMap<String,String>();
 	}
 
 	//----------------------------------
 	//------ From ISearchGateway -------
 	//----------------------------------
 	@Override
-	public void registerServer(String serverName) throws RemoteException
+	public void registerServer(String serverName, String address) throws RemoteException
 	{
 		try {
 			System.out.print("Registering server...");
 
-			servers.add(serverName);
+			servers.put(serverName, address);
 
 			System.out.print("done.\n");
 		} catch(Exception e) {
@@ -39,11 +41,17 @@ public class SearchGateway extends UnicastRemoteObject implements ISearchGateway
 	{
 		if(servers.isEmpty()) return;
 
+		System.out.println("Enter register()");
+
 		try{
 			System.out.print("Registering word '" + w + "'...");
 			
+			//this will randomly distribute the words among the repositories
 			int serverId = (new Random()).nextInt() % servers.size();
-			IRepository repo = (IRepository)Naming.lookup( servers.get(serverId) );
+			String serverName = servers.keySet().toArray(new String[0])[serverId];
+
+			Registry reg = LocateRegistry.getRegistry(servers.get(serverName), Repository.PORT);
+			IRepository repo = (IRepository)reg.lookup( servers.get(serverId) );
 			
 			repo.pushWord(w);
 
@@ -64,9 +72,11 @@ public class SearchGateway extends UnicastRemoteObject implements ISearchGateway
 		try {
 			System.out.print("Searching for '" + w + "'...");
 
-			for(String name : servers)
+			for( String name : servers.keySet().toArray(new String[0]) )
 			{
-				IRepository repo = (IRepository)Naming.lookup(name);
+				Registry reg = LocateRegistry.getRegistry(servers.get(name), Repository.PORT);
+				IRepository repo = (IRepository)reg.lookup(name);
+
 				if( repo.hasWord(w) ) out.add(name);
 			}
 
@@ -77,42 +87,6 @@ public class SearchGateway extends UnicastRemoteObject implements ISearchGateway
 			e.printStackTrace();
 		} finally {
 			return out;
-		}
-	}
-
-	public static class ClientRMISocket implements RMIClientSocketFactory
-	{
-		@Override
-	 	public Socket createSocket(String host, int port)
-	 	{
-	 		Socket out = null;
-
-	 		try {
-	 			out = new Socket(host, 1100);
-	 		} catch(Exception e) {
-	 			System.err.println("Error while creating Client socket:\n" + e.getMessage());
-	 			e.printStackTrace();
-	 		}
-
-	 		return out;
-	 	}
-	}
-
-	public static class ServerRMISocket implements RMIServerSocketFactory
-	{
-		@Override
-		public ServerSocket createServerSocket(int port)
-		{
-	 		ServerSocket out = null;
-
-	 		try {
-	 			out = new ServerSocket(1099);
-	 		} catch(Exception e) {
-	 			System.err.println("Error while creating Server socket:\n" + e.getMessage());
-	 			e.printStackTrace();
-	 		}
-
-	 		return out;	
 		}
 	}
 
@@ -131,11 +105,8 @@ public class SearchGateway extends UnicastRemoteObject implements ISearchGateway
 		try {
 			System.out.println("Waking up query server...");
 
-			SearchGateway.ServerRMISocket ssf = new SearchGateway.ServerRMISocket();
-			SearchGateway.ClientRMISocket csf = new SearchGateway.ClientRMISocket();
-
 			ISearchGateway rep = new SearchGateway();
-			Registry reg = LocateRegistry.createRegistry(1099, csf, ssf);
+			Registry reg = LocateRegistry.createRegistry(SearchGateway.PORT);
 			reg.rebind("query", rep);
 
 			System.out.print("Ok. I'm listening at " + address + ":query.");
