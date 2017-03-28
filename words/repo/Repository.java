@@ -9,7 +9,7 @@ import words.search.*;
 import words.client.*;
 
 public class Repository extends UnicastRemoteObject implements IRepository {
-	public static final int PORT = 1099;
+	public static int PORT = 1100;
 	private Set<String> words;
 
 	public Repository() throws RemoteException {
@@ -42,15 +42,17 @@ public class Repository extends UnicastRemoteObject implements IRepository {
 	//----- repository thread -----
 	public static void main(String[] args) {
 
-		if(args.length < 3)
+		if(args.length < 4)
 		{
-			System.err.println("Provide server name, address and gateway address as argument.");
+			System.err.println("Provide server name, address, port and gateway address as argument.");
 			return;
 		}
 
 		String serverName = args[0];
 		String serverAddress = args[1];
-		String gatewayAddress = args[2];
+		int serverPort = Integer.parseInt(args[2]);
+		String gatewayAddress = args[3];
+
 
 	  	System.setProperty("java.rmi.server.hostname", serverAddress);
 
@@ -60,7 +62,7 @@ public class Repository extends UnicastRemoteObject implements IRepository {
 			
 			Registry gatewayReg = LocateRegistry.getRegistry(gatewayAddress, SearchGateway.PORT);
 			ISearchGateway gateway = (ISearchGateway)gatewayReg.lookup("query");
-			gateway.registerServer(serverName, serverAddress);
+			gateway.registerServer(serverName, serverAddress, serverPort);
 			
 			System.out.print("done.\n");
 
@@ -68,7 +70,7 @@ public class Repository extends UnicastRemoteObject implements IRepository {
 			System.out.println("Waking up server...");
 			
 			IRepository rep = new Repository();
-			Registry reg = LocateRegistry.createRegistry(Repository.PORT);
+			Registry reg = LocateRegistry.createRegistry(serverPort);
 			reg.rebind(serverName, rep);
 			
 			System.out.println("Ok. I'm listening at " + serverAddress + ":" + serverName);
