@@ -24,7 +24,7 @@ public class Repository {
 		words.remove(w);
 	}
 
-	public boolean hasWord(String w) {
+	public Boolean hasWord(String w) {
 		System.out.println("[Repository] Looking for word '" + w + "'");
 		return words.contains(w);
 	}

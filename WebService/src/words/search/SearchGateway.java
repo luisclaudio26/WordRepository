@@ -64,7 +64,7 @@ public class SearchGateway
 			Object[] hasWordArgs = new Object[] { w };
 			Class[] returnTypes = new Class[]{ Boolean.class }; // boolean
 			Object[] response = serviceClient.invokeBlocking(hasWord, hasWordArgs, returnTypes);
-			System.out.println(response);
+			System.out.println(response[0]);
 			if((Boolean)response[0]){
 				found.add(repo);
 			}
