@@ -11,12 +11,12 @@ public class Client
 {
 	public static void main(String[] args) throws AxisFault
 	{
-		if( args.length < 2 )
+		if( args.length < 1 )
 		{
 			System.out.println("Please input search gateway address.");
 			return;
 		}
-		String gatewayIP = "http://" + args[0] + ":8080/axis2/services/RepositoryService";
+		String gatewayIP = "http://" + args[0] + ":8080/axis2/services/SearchService";
 		Scanner in = new Scanner(System.in);
 
 		//remote call stuff

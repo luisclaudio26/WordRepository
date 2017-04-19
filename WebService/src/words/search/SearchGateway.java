@@ -27,6 +27,12 @@ public class SearchGateway
 	
 	public void register(String w) throws AxisFault
 	{
+		if(repoList.size() == 0)
+		{
+			System.out.println("[Search gateway] No repository registered");
+			return;
+		}
+		
 		//this will randomly distribute the words among the repositories
 		int id = (new Random()).nextInt() % repoList.size();
 		String repo = "http://" + repoList.get(id) + ":8080/axis2/services/RepositoryService";
@@ -36,6 +42,7 @@ public class SearchGateway
 		RPCServiceClient serviceClient = new RPCServiceClient();
 		Options options = serviceClient.getOptions();
 		options.setTo( new EndpointReference(repo) );
+		options.setAction("urn:pushWord");
 
 		QName pushWord = new QName("http://repo.words", "pushWord");
 		Object[] pushWordArgs = new Object[] { w };
