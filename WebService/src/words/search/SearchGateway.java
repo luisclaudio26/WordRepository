@@ -49,8 +49,26 @@ public class SearchGateway
 		serviceClient.invokeRobust(pushWord, pushWordArgs);
 	}
 	
-	public List<String> search(String w)
+	public List<String> search(String w) throws AxisFault
 	{
-		return null;
+		List<String> found = new ArrayList<String>();
+		for(String r: repoList){
+			String repo = "http://" + r + ":8080/axis2/services/RepositoryService";
+			System.out.println("Looking up at " + repo);
+			RPCServiceClient serviceClient = new RPCServiceClient();
+			Options options = serviceClient.getOptions();
+			options.setTo( new EndpointReference(repo) );
+			options.setAction("urn:hasWord");
+			
+			QName hasWord = new QName("http://repo.words", "hasWord");
+			Object[] hasWordArgs = new Object[] { w };
+			Class[] returnTypes = new Class[]{ Boolean.class }; // boolean
+			Object[] response = serviceClient.invokeBlocking(hasWord, hasWordArgs, returnTypes);
+			if((Boolean)response[0]){
+				found.add(repo);
+			}
+		}
+		return found;
 	}
 }
+
