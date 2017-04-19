@@ -1,4 +1,4 @@
-<service name="Repository" scope="application">
+<service name="RepositoryService" scope="application">
 
 	<messageReceivers>
         <messageReceiver mep="http://www.w3.org/ns/wsdl/in-only"
@@ -7,6 +7,5 @@
                          class="org.apache.axis2.rpc.receivers.RPCMessageReceiver"/>
 	</messageReceivers>
 
-	<parameter name="ServiceClass">words.repo.Repository</parameter>
-	
+	<parameter name="ServiceClass">words.repo.Repository</parameter>	
 </service>
