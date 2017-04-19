@@ -41,7 +41,7 @@ public class Client
                 {
 					//Upar uma palavraqq
 					QName register = new QName("http://search.words", "register");
-
+					
 					Object[] registerArgs = new Object[] { word };
 					serviceClient.invokeRobust(register, registerArgs);
                     
@@ -49,10 +49,23 @@ public class Client
                 }
             case 2:
                 {
+                	//Procurar palavra
+                	QName register = new QName("http://search.words", "search");
+					
+					Object[] registerArgs = new Object[] { word };
+					Class[] returnTypes = new Class[]{ List.class };
+					Object[] response = serviceClient.invokeBlocking(register, registerArgs, returnTypes);
+					System.out.println("Word "+word+" found at:");
+					// System.out.println(response.length);
+					System.out.println(response[0]);
+					/* for(String s: (List<String>)response[0]){
+						System.out.println(s);
+					} */
                     break;
                 }
             default: 
-                { 
+                {
+                	System.out.println("Escolha uma opção válida.");
                     break;
                 }
             }
@@ -76,3 +89,4 @@ public class Client
 
 	}
 }
+
