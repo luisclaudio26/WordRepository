@@ -22,6 +22,7 @@ public class SearchGateway
 	//------------------------
 	public void registerServer(String serverIP)
 	{
+		System.out.println("[Search gateway] Registering server " + serverIP);
 		repoList.add( serverIP );
 	}
 	
@@ -37,7 +38,7 @@ public class SearchGateway
 		int id = (new Random()).nextInt() % repoList.size();
 		String repo = "http://" + repoList.get(id) + ":8080/axis2/services/RepositoryService";
 
-		System.out.println("Storing word at " + repo);
+		System.out.println("[Search gateway] Storing word at " + repo);
 
 		RPCServiceClient serviceClient = new RPCServiceClient();
 		Options options = serviceClient.getOptions();
@@ -49,12 +50,12 @@ public class SearchGateway
 		serviceClient.invokeRobust(pushWord, pushWordArgs);
 	}
 	
-	public List<String> search(String w) throws AxisFault
+	public String[] search(String w) throws AxisFault
 	{
 		List<String> found = new ArrayList<String>();
 		for(String r: repoList){
 			String repo = "http://" + r + ":8080/axis2/services/RepositoryService";
-			System.out.println("Looking up at " + repo);
+			System.out.println("[Search gateway] Looking up at " + repo);
 			RPCServiceClient serviceClient = new RPCServiceClient();
 			Options options = serviceClient.getOptions();
 			options.setTo( new EndpointReference(repo) );
@@ -65,11 +66,18 @@ public class SearchGateway
 			Class[] returnTypes = new Class[]{ Boolean.class }; // boolean
 			Object[] response = serviceClient.invokeBlocking(hasWord, hasWordArgs, returnTypes);
 			System.out.println(response[0]);
+
 			if((Boolean)response[0]){
 				found.add(repo);
 			}
 		}
-		return found;
+
+		System.out.print("[Search gateway] Returning this: [");
+		for(String r : found)
+			System.out.print(r + ", ");
+		System.out.println("]");
+
+		return found.toArray( new String[found.size()] );
 	}
 }
 

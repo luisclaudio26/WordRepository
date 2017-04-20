@@ -28,7 +28,7 @@ public class Client
 		{
 			int opt; String word;
 
-			System.out.print("Word: "); 
+			System.out.print("\nWord: "); 
 			word = in.next();
 
             System.out.println("1. Push word");
@@ -51,16 +51,23 @@ public class Client
                 {
                 	//Procurar palavra
                 	QName register = new QName("http://search.words", "search");
-					
 					Object[] registerArgs = new Object[] { word };
-					Class[] returnTypes = new Class[]{ List.class };
+					Class[] returnTypes = new Class[]{ String[].class };
+
 					Object[] response = serviceClient.invokeBlocking(register, registerArgs, returnTypes);
-					System.out.println("Word "+word+" found at:");
-					// System.out.println(response.length);
-					System.out.println(response[0]);
-					/* for(String s: (List<String>)response[0]){
-						System.out.println(s);
-					} */
+						
+					if( response[0] == null)
+						System.err.println("Search gateway returned null!");
+					else
+					{
+						String[] repo = (String[])(response[0]);
+
+						System.out.print(word + "is in servers: [");
+						for(String s : repo)
+							System.out.print(s + ", ");
+						System.out.print("]");
+					}
+
                     break;
                 }
             default: 
